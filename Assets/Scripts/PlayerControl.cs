@@ -2,58 +2,84 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour 
+public class PlayerControl : MonoBehaviour 
 {
     // Fuerza de salto
     public float jumpPower = 6f;
     
     // Referencia al Rigidbody2D del jugador
-    private Rigidbody2D rb;
+    private Rigidbody2D rigidBody;
 
     // Capa que define el suelo
     public LayerMask groundLayer;
 
-    void Awake()
+    // Referencia al Animator
+    private Animator animator;
+
+    // Variables constantes para los parámetros del Animator
+    private const string STATE_ALIVE = "isALive";
+    private const string STATE_ON_THE_GROUND = "isOnTheGround";
+
+    private void Awake()
     {
-        // Obtiene el componente Rigidbody2D al que está adjunto el script
-        rb = GetComponent<Rigidbody2D>();
+        // Obtiene los componentes necesarios
+        rigidBody = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
-    // Inicialización (puede dejarse vacío)
-    void Start() 
+    private void Start() 
     {
+        // Configuración inicial de las variables del Animator
+        animator.SetBool(STATE_ALIVE, true);
+        animator.SetBool(STATE_ON_THE_GROUND, false);
     }
 
-    // Se llama una vez por fotograma
-    void Update() 
+    private void Update() 
     {
-        // Comprueba si se presiona espacio o el clic izquierdo del ratón
+        // Detecta si se presiona espacio o clic izquierdo del ratón para saltar
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
             PerformJump();
         }
 
-        // Dibuja una línea roja debajo del jugador para visualizar el área de detección de suelo
-        Debug.DrawRay(transform.position, Vector2.down * 1.5f, Color.red);
+        // Actualiza el estado de si está en el suelo
+        animator.SetBool(STATE_ON_THE_GROUND, IsGrounded());
+
+        // Línea roja para depurar el rayo que detecta el suelo
+        Debug.DrawRay(transform.position, Vector2.down * 1.2f, Color.red);
     }
 
     // Función que realiza el salto
     void PerformJump()
     {
-        // Comprueba si está en el suelo antes de saltar
         if (IsGrounded())
         {
-            rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            rigidBody.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+
+
+             // Actualiza el estado del Animator
+            animator.SetBool("isOnTheGround", false);
+            animator.SetBool("isJumpingUp", true);
         }
     }
 
-    // Comprueba si el personaje está en el suelo
+    // Comprueba si el personaje está tocando el suelo
     bool IsGrounded()
     {
         // Lanza un rayo hacia abajo para detectar el suelo
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.5f, groundLayer);
-        
-        // Retorna true si el rayo detecta una colisión con el suelo
-        return hit.collider != null;
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.2f, groundLayer);
+
+         return hit.collider != null;
+
+        if (hit.collider != null)
+        {
+            
+            return true;
+        }
+        else
+        {
+            
+            return false;
+        }
     }
 }
