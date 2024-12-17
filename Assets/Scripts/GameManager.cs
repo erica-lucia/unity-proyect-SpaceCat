@@ -2,105 +2,89 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Crear los enumerados
-public enum GamePhase {
+public enum GamePhase
+{
     MainMenu,
     Playing,
     GameOver
 }
 
-public class GameManager : MonoBehaviour {
-
+public class GameManager : MonoBehaviour
+{
     public GamePhase activePhase = GamePhase.MainMenu;
-    public static GameManager sharedInstance; //un singleton, instanciacompartida
+    public static GameManager sharedInstance;
 
-    private PlayerControl control;
+    private PlayerControl playerControl;
 
-    
-    public void Awake(){ 
-    //inicializamos el shareInstance
+    private void Awake()
+    {
         if (sharedInstance == null)
         {
             sharedInstance = this;
         }
     }
-    
-    
-    // Called when the script is first initialized
-    private void Start () {
-        control= GameObject.Find("Player").GetComponent<PlayerControl>();
-        
+
+    private void Start()
+    {
+        playerControl = GameObject.Find("Player").GetComponent<PlayerControl>();
     }
 
-    
-
-    // Called once per frame
     private void Update()
     {
-        if (Input.GetButtonDown("Submit"))
+        // Detectar inicio o reinicio del juego
+        if (Input.GetButtonDown("Submit") && activePhase != GamePhase.Playing)
         {
-        if (activePhase == GamePhase.GameOver)
-        {
-            RestartGame();
-        }
-        else if (activePhase == GamePhase.MainMenu)
-        {
-            BeginGame();
+            if (activePhase == GamePhase.GameOver)
+            {
+                RestartGame();
+            }
+            else if (activePhase == GamePhase.MainMenu)
+            {
+                StartGame();
+            }
         }
     }
+
+    public void StartGame()
+    {
+        Debug.Log("Iniciando el juego...");
+        ChangePhase(GamePhase.Playing);
     }
 
-
-        
-    
-
-    //Metodo para iniciar la partida( Logic to start the game)
-    public void BeginGame() {
-       ChangePhase(GamePhase.Playing);
-    } 
-
-    //Metodo para finalizar la partida(Logic for when the game ends)
     public void GameOver()
     {
-        Debug.Log("EndGame() llamado. Cambiando a GamePhase.GameOver...");
+        Debug.Log("Fin del juego. Cambiando a GameOver...");
         ChangePhase(GamePhase.GameOver);
     }
 
-
-
-    //Metodo para volver al menu(Logic to return to the menu)
-    public void ReturnToMainMenu() {
-        ChangePhase(GamePhase.MainMenu);
-         
-    }
-
-    //unico//
-        public void RestartGame()
+    public void RestartGame()
     {
         Debug.Log("Reiniciando el juego...");
         ChangePhase(GamePhase.Playing);
 
-        // Reinicia la posición del jugador (asume que tienes acceso al jugador)
-        PlayerControl player = FindObjectOfType<PlayerControl>();
-        if (player != null)
+        // Reiniciar el jugador
+        if (playerControl != null)
         {
-        player.RestartPlayer();
+            playerControl.RestartPlayer();
         }
     }
 
+    private void ChangePhase(GamePhase nextPhase)
+    {
+        Debug.Log($"Cambiando a la fase: {nextPhase}");
+        activePhase = nextPhase;
 
-
-
-    private void ChangePhase(GamePhase nextPhase) {
-        if (nextPhase == GamePhase.MainMenu) {
-            // TODO: colocar la logica del menu
-        } else if (nextPhase == GamePhase.Playing) {
-            // TODO: Preparar la escena para jugar
-        } else if (nextPhase == GamePhase.GameOver) {
-            // TODO: preparar el juego para el gameover
+        switch (nextPhase)
+        {
+            case GamePhase.MainMenu:
+                Debug.Log("Preparando menú principal...");
+                break;
+            case GamePhase.Playing:
+                Debug.Log("Juego iniciado...");
+                break;
+            case GamePhase.GameOver:
+                Debug.Log("Preparando Game Over...");
+                break;
         }
-
-        this.activePhase = nextPhase;
     }
 }
-
