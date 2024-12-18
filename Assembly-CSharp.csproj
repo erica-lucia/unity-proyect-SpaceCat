@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\PlayerControl.cs" />
     <Compile Include="Assets\Scripts\DeathZone.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\LevelBlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
