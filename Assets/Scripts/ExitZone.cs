@@ -15,4 +15,8 @@ public class ExitZone : MonoBehaviour
     {
         
     }
+    void OnTriggerEnter2d(Collider2D collisiion){ 
+        Debug.Log("Debemos destruir el bloque anterior");
+
+    }
 }
