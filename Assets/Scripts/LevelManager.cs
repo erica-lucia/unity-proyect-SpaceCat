@@ -3,48 +3,76 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
-{ 
+{
     public static LevelManager sharedInstance;
-    public List<LevelBlock>alltheLevelBlocks=new List<LevelBlock>();
-    public List<LevelBlock>currentLevelBlocks=new List<LevelBlock>();
-    public Transform LevelStartPosition;
+    public List<LevelBlock> allTheLevelBlocks = new List<LevelBlock>();
+    public List<LevelBlock> currentLevelBlocks = new List<LevelBlock>();
+    public Transform levelStartPosition;
 
-
-    private void Awake(){ 
-        if(sharedInstance==null){ 
-            sharedInstance= this;
+    private void Awake()
+    {
+        if (sharedInstance == null)
+        {
+            sharedInstance = this;
         }
     }
 
-    // Start is called before the first frame update
     private void Start()
     {
         GenerateInitialBlocks();
     }
 
-    // Update is called once per frame
-    private void Update()
+    public void AddLevelBlock()
     {
-        
+        int randomIdx = Random.Range(0, allTheLevelBlocks.Count);
+        LevelBlock block;
+        Vector3 spawnPosition = Vector3.zero;
+
+        if (currentLevelBlocks.Count == 0)
+        {
+            block = Instantiate(allTheLevelBlocks[0]);
+            spawnPosition = levelStartPosition.position;
+        }
+        else
+        {
+            block = Instantiate(allTheLevelBlocks[randomIdx]);
+            spawnPosition = currentLevelBlocks[currentLevelBlocks.Count - 1].exitPoint.position;
+        }
+
+        block.transform.SetParent(this.transform, false);
+
+        Vector3 correction = new Vector3(
+            spawnPosition.x - block.startPoint.position.x,
+            spawnPosition.y - block.startPoint.position.y,
+            0
+        );
+        block.transform.position += correction;
+
+        currentLevelBlocks.Add(block);
     }
 
+    public void RemoveLevelBlock()
+    {
+        if (currentLevelBlocks.Count > 0)
+        {
+            LevelBlock blockToRemove = currentLevelBlocks[0];
+            currentLevelBlocks.Remove(blockToRemove);
+            Destroy(blockToRemove.gameObject);
+        }
+    }
 
-    //Metodo para añadir un bloque
-    public void AddLevelBlock(){ 
+    public void RemoveAllLevelBlocks()
+    {
+        while (currentLevelBlocks.Count > 0)
+        {
+            RemoveLevelBlock();
+        }
+    }
 
-    } 
-
-    public void RemoveLevelBlock(){ 
-
-    } 
-
-    public void RemoveAllLevelBlocks(){ 
-
-    } 
-
-    //metodo para generar los bloques iniciales 
-    public void GenerateInitialBlocks(){ 
-        for (int i =0; i<2; i++){ 
+    public void GenerateInitialBlocks()
+    {
+        for (int i = 0; i < 2; i++)
+        {
             AddLevelBlock();
         }
     }
