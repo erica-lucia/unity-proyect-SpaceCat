@@ -78,12 +78,15 @@ public class GameManager : MonoBehaviour
         {
             case GamePhase.MainMenu:
                 Debug.Log("Preparando menú principal...");
+                MenuManager.sharedInstance.ShowMainMenu();
                 break;
             case GamePhase.Playing:
                 Debug.Log("Juego iniciado...");
+                MenuManager.sharedInstance.HideMainMenu();
                 break;
             case GamePhase.GameOver:
                 Debug.Log("Preparando Game Over...");
+                MenuManager.sharedInstance.ShowMainMenu();
                 break;
         }
     }

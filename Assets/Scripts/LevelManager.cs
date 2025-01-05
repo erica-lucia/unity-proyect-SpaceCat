@@ -48,12 +48,12 @@ public class LevelManager : MonoBehaviour {
 
         block.transform.SetParent(this.transform,false);
 
-        Vector3 correction = new Vector3(
-            spawnPosition.x-block.startPoint.position.x,
-            spawnPosition.y-block.startPoint.position.y,
-            0 );
-        block.transform.position = correction;
-        currentLevelBlocks.Add(block);
+        //Vector3 correction = new Vector3(
+            //spawnPosition.x-block.startPoint.position.x,
+            //spawnPosition.y-block.startPoint.position.y,
+            //0 );
+        //block.transform.position = correction;
+        //currentLevelBlocks.Add(block);
     }
 
     public void RemoveLevelBlock(){
@@ -63,6 +63,10 @@ public class LevelManager : MonoBehaviour {
     }
 
     public void RemoveAllLevelBlocks(){
+        //mientras existan bloques es decir sean mayor a 0 invocamos a removeLevelBlock
+        while(currentLevelBlocks.Count>0){ 
+            RemoveLevelBlock();
+        }
 
     }
 
