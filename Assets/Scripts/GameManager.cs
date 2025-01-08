@@ -14,7 +14,10 @@ public class GameManager : MonoBehaviour
     public GamePhase activePhase = GamePhase.MainMenu;
     public static GameManager sharedInstance;
 
-    private PlayerControl playerControl;
+    private PlayerControl playerControl; 
+    public int collectedObject = 0;
+    private LevelManager levelManager;
+    private MenuManager menuManager;
 
     private void Awake()
     {
@@ -22,16 +25,31 @@ public class GameManager : MonoBehaviour
         {
             sharedInstance = this;
         }
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     private void Start()
     {
-        playerControl = GameObject.Find("Player").GetComponent<PlayerControl>();
+        playerControl = GameObject.Find("Player")?.GetComponent<PlayerControl>();
+        if (playerControl == null)
+        {
+            Debug.LogError("PlayerControl no encontrado.");
+        }
+
+        levelManager = LevelManager.sharedInstance;
+        menuManager = MenuManager.sharedInstance;
+
+        if (levelManager == null || menuManager == null)
+        {
+            Debug.LogError("Faltan referencias a LevelManager o MenuManager.");
+        }
     }
 
     private void Update()
     {
-        // Detectar inicio o reinicio del juego
         if (Input.GetButtonDown("Submit") && activePhase != GamePhase.Playing)
         {
             if (activePhase == GamePhase.GameOver)
@@ -47,47 +65,48 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        Debug.Log("Iniciando el juego...");
         ChangePhase(GamePhase.Playing);
     }
 
     public void GameOver()
     {
-        Debug.Log("Fin del juego. Cambiando a GameOver...");
         ChangePhase(GamePhase.GameOver);
     }
 
     public void RestartGame()
     {
-        Debug.Log("Reiniciando el juego...");
         ChangePhase(GamePhase.Playing);
-
-        // Reiniciar el jugador
-        if (playerControl != null)
-        {
-            playerControl.RestartPlayer();
-        }
+        playerControl?.RestartPlayer();
     }
 
     private void ChangePhase(GamePhase nextPhase)
     {
-        Debug.Log($"Cambiando a la fase: {nextPhase}");
         activePhase = nextPhase;
 
         switch (nextPhase)
         {
             case GamePhase.MainMenu:
-                Debug.Log("Preparando menú principal...");
-                MenuManager.sharedInstance.ShowMainMenu();
+                menuManager?.ShowMainMenu();
+                menuManager?.HideGameMenu();
+                menuManager?.HideGameOverMenu();
                 break;
+
             case GamePhase.Playing:
-                Debug.Log("Juego iniciado...");
-                MenuManager.sharedInstance.HideMainMenu();
+                levelManager?.RemoveAllLevelBlocks();
+                levelManager?.GenerateInitialBlocks();
+                playerControl?.StartGame();
+                menuManager?.HideMainMenu();
+                menuManager?.ShowGameMenu();
                 break;
+
             case GamePhase.GameOver:
-                Debug.Log("Preparando Game Over...");
-                MenuManager.sharedInstance.ShowMainMenu();
+                menuManager?.ShowGameOverMenu();
+                menuManager?.HideGameMenu();
+                menuManager?.HideMainMenu();
                 break;
         }
+    } 
+    public void CollectObject(Collectable collectable){
+        collectedObject += collectable.value;
     }
 }

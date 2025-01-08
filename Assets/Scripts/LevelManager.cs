@@ -2,76 +2,80 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour {
-
+public class LevelManager : MonoBehaviour
+{
     public static LevelManager sharedInstance;
 
     public List<LevelBlock> allTheLevelBlocks = new List<LevelBlock>();
-
     public List<LevelBlock> currentLevelBlocks = new List<LevelBlock>();
-
     public Transform levelStartPosition;
 
-    void Awake()
+    private void Awake()
     {
-        if(sharedInstance == null){
+        if (sharedInstance == null)
+        {
             sharedInstance = this;
         }
     }
-    // Use this for initialization
-    void Start () {
+
+    private void Start()
+    {
         GenerateInitialBlocks();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-
-    public void AddLevelBlock(){
-        int randomIdx = Random.Range(0, allTheLevelBlocks.Count);
-
-        LevelBlock block;
-
-        Vector3 spawnPosition = Vector3.zero;
-
-        if(currentLevelBlocks.Count == 0){
-            block = Instantiate(allTheLevelBlocks[0]);
-            spawnPosition = levelStartPosition.position;
-        }else{
-            block = Instantiate(allTheLevelBlocks[randomIdx]);
-            spawnPosition = currentLevelBlocks
-                [currentLevelBlocks.Count - 1].
-                 exitPoint.position;
-        }
-
-        block.transform.SetParent(this.transform,false);
-
-        //Vector3 correction = new Vector3(
-            //spawnPosition.x-block.startPoint.position.x,
-            //spawnPosition.y-block.startPoint.position.y,
-            //0 );
-        //block.transform.position = correction;
-        //currentLevelBlocks.Add(block);
     }
 
-    public void RemoveLevelBlock(){
+    public void AddLevelBlock()
+    {
+        if (allTheLevelBlocks.Count == 0)
+        {
+            Debug.LogError("No hay bloques de nivel en la lista 'allTheLevelBlocks'.");
+            return;
+        }
+
+        int randomIdx = Random.Range(0, allTheLevelBlocks.Count);
+        LevelBlock block;
+        Vector3 spawnPosition;
+
+        if (currentLevelBlocks.Count == 0)
+        {
+            block = Instantiate(allTheLevelBlocks[0]);
+            spawnPosition = levelStartPosition.position;
+        }
+        else
+        {
+            block = Instantiate(allTheLevelBlocks[randomIdx]);
+            spawnPosition = currentLevelBlocks[currentLevelBlocks.Count - 1].exitPoint.position;
+        }
+
+        block.transform.SetParent(this.transform, false);
+
+        Vector3 correction = new Vector3(
+            spawnPosition.x - block.startPoint.position.x,
+            spawnPosition.y - block.startPoint.position.y,
+            0);
+        block.transform.position = correction;
+
+        currentLevelBlocks.Add(block);
+    }
+
+    public void RemoveLevelBlock()
+    {
         LevelBlock oldBlock = currentLevelBlocks[0];
         currentLevelBlocks.Remove(oldBlock);
         Destroy(oldBlock.gameObject);
     }
 
-    public void RemoveAllLevelBlocks(){
-        //mientras existan bloques es decir sean mayor a 0 invocamos a removeLevelBlock
-        while(currentLevelBlocks.Count>0){ 
+    public void RemoveAllLevelBlocks()
+    {
+        while (currentLevelBlocks.Count > 0)
+        {
             RemoveLevelBlock();
         }
-
     }
 
-    public void GenerateInitialBlocks(){
-        for (int i = 0; i < 2; i++){
+    public void GenerateInitialBlocks()
+    {
+        for (int i = 0; i < 2; i++)
+        {
             AddLevelBlock();
         }
     }

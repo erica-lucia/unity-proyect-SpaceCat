@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LevelBlock : MonoBehaviour
 {
-    public Transform starPoint ;
+    public Transform startPoint ;
     public Transform exitPoint;
     
     // Start is called before the first frame update
