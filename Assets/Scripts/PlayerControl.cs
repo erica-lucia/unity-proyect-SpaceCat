@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Advertisements;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -15,6 +16,9 @@ public class PlayerControl : MonoBehaviour
 
     private const string STATE_ALIVE = "isAlive";
     private const string STATE_ON_THE_GROUND = "isOnTheGround"; 
+    
+    [SerializeField] //esto me permitira ver el healtPoints y manaPoints en el editor de unity aunque sean privadas, pero desde el editor no se pueden modicar
+
     private int healthPoints, manaPoints;
 
 
@@ -131,14 +135,24 @@ public class PlayerControl : MonoBehaviour
     //    return;
     // }
 
-        animator.SetBool(STATE_ALIVE, false);
+        animator.SetBool("isAlive", false);// antes tenia STATE_ALIVE
+        Debug.Log("Parámetro 'isAlive' configurado en false.");
         GameManager.sharedInstance.GameOver();
+        Debug.Log("El jugador ha muerto.");//aumente esta linea xq el personaje no moria
     } 
     public void CollectHealth(int points){
         this.healthPoints += points;
-        if(this.healthPoints >= MAX_HEALTH){
+        if(this.healthPoints >= MAX_HEALTH){ //>= estaba antes
             this.healthPoints = MAX_HEALTH;
+        } 
+        if(this.healthPoints<=0){ 
+            
+            this.healthPoints = 0;
+            Die();
+            //Die();estaba antes
         }
+
+        
     }
 
     public void CollectMana(int points){
